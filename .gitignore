@@ -1,0 +1,5 @@
+*.python-version
+models/*
+output/*
+*_env/*
+*__pycache__*

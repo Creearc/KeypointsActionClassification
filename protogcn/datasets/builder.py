@@ -32,6 +32,7 @@ def build_dataset(cfg, default_args=None):
     Returns:
         Dataset: The constructed dataset.
     """
+
     dataset = build_from_cfg(cfg, DATASETS, default_args)
     return dataset
 

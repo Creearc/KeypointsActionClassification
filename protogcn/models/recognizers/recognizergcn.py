@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn as nn
 
 from ..builder import RECOGNIZERS
 from .base import BaseRecognizer
@@ -27,7 +28,7 @@ class RecognizerGCN(BaseRecognizer):
     def forward_test(self, keypoint, **kwargs):
         """Defines the computation performed at every call when evaluation and
         testing."""
-        assert self.with_cls_head or self.feat_ext
+        #assert self.with_cls_head or self.feat_ext
         bs, nc = keypoint.shape[:2]
         keypoint = keypoint.reshape((bs * nc, ) + keypoint.shape[2:])
 
@@ -61,7 +62,19 @@ class RecognizerGCN(BaseRecognizer):
                     x = x + b[..., None, None]
                 x = x[None]
             return x.data.cpu().numpy().astype(np.float16)
+        
+        # # NEW VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+        if self.cls_head is None:
+            pool = nn.AdaptiveAvgPool2d(1)
+            N, M, C, T, V = x.shape
+            x = x.reshape(N * M, C, T, V)
 
+            x = pool(x)
+            x = x.reshape(N, M, C)
+            x = x.mean(dim=1)
+            return x.data.cpu().numpy().astype(np.float16)
+        
+        # # NEW ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         cls_score = self.cls_head(x)
         cls_score = cls_score.reshape(bs, nc, cls_score.shape[-1])
         if 'average_clips' not in self.test_cfg:

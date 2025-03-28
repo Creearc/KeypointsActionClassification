@@ -189,6 +189,8 @@ class UniformSampleDecode:
     # will directly return the decoded clips
     def _get_clips(self, full_kp, clip_len):
         M, T, V, C = full_kp.shape
+
+        #print(f"--> {full_kp} {full_kp.shape}")
         clips = []
 
         for clip_idx in range(self.num_clips):
@@ -228,6 +230,7 @@ class UniformSampleDecode:
         kp = kp.astype(np.float32)
         # start_index will not be used
         kp = self._get_clips(kp, self.clip_len)
+        print(f"handle dict --> {kp.shape}")
 
         results['clip_len'] = self.clip_len
         results['frame_interval'] = None
@@ -248,6 +251,7 @@ class UniformSampleDecode:
 
             kp = kp.astype(np.float32)
             kp = self._get_clips(kp, self.clip_len)
+            print(f"handle list --> {kp.shape}")
             clips.append(kp)
         ret = cp.deepcopy(results[0])
         ret['clip_len'] = self.clip_len

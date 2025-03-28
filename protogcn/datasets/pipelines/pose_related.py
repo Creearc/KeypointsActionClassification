@@ -460,7 +460,7 @@ class GenSkeFeat:
 class FormatGCNInput:
     """Format final skeleton shape to the given input_format. """
 
-    def __init__(self, num_person=2, mode='zero'):
+    def __init__(self, num_person=1, mode='zero'):
         self.num_person = num_person
         assert mode in ['zero', 'loop']
         self.mode = mode
@@ -473,6 +473,7 @@ class FormatGCNInput:
                 to the next transform in pipeline.
         """
         keypoint = results['keypoint']
+        # print(f"FormatGCNInput --> {keypoint} {keypoint.shape}")
         if 'keypoint_score' in results:
             keypoint = np.concatenate((keypoint, results['keypoint_score'][..., None]), axis=-1)
 
@@ -493,6 +494,8 @@ class FormatGCNInput:
         assert T % nc == 0
         keypoint = keypoint.reshape((M, nc, T // nc, V, C)).transpose(1, 0, 2, 3, 4)
         results['keypoint'] = np.ascontiguousarray(keypoint)
+        keypoint = results['keypoint']
+        # print(f"FormatGCNInput out --> {keypoint} {keypoint.shape}")
         return results
 
     def __repr__(self):
